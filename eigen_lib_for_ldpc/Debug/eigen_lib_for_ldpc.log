@@ -1,7 +1,7 @@
-﻿Сборка начата 01.06.2014 16:43:57.
+﻿Сборка начата 01.06.2014 21:15:25.
      1>Проект "C:\eigen_lib_for_ldpc\eigen_lib_for_ldpc\eigen_lib_for_ldpc.vcxproj" в узле 2 (целевые объекты build).
      1>InitializeBuildStatus:
-         Создание "Debug\eigen_lib_for_ldpc.unsuccessfulbuild", так как было задано "AlwaysCreate".
+         Обращение к "Debug\eigen_lib_for_ldpc.unsuccessfulbuild".
        ClCompile:
          C:\Program Files\Microsoft Visual Studio 10.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D _MBCS /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Fo"Debug\\" /Fd"Debug\vc100.pdb" /Gd /TP /analyze- /errorReport:prompt my_ldpc_4__8.cpp
          my_ldpc_4__8.cpp
@@ -19,4 +19,4 @@
 
 Построение успешно завершено.
 
-Затраченное время: 00:00:02.03
+Затраченное время: 00:00:02.90

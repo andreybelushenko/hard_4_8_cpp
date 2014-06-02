@@ -47,7 +47,7 @@ int main()
 
 
 
-		// формируем матрицу parity_check [4][4];
+		// matrix parity_check [4][4];
 		for  (int i = 0; i < 4; i++)
 		{
 			int p = 0;
@@ -66,6 +66,9 @@ int main()
 			cout << endl;
 		}
 		cout << endl;  cout << endl;
+		
+
+		
 					  
 
 					
