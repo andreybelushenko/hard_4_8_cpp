@@ -36,9 +36,10 @@ int main()
 			{
 				if (h_check_matrix[i][j] == 1)
 				{	
-					k++;
+					
 					f_check_nodes[i][k] = c_bit_nodes[j];	
 					cout<<f_check_nodes[i][k];
+					k++;
 				}
 			}
 			cout << endl;
