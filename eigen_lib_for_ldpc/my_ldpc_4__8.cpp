@@ -42,20 +42,20 @@ int main()
 
 	int sindrom = matr_vec_mult(h_check_matrix, y_received_codeword);
 
-	ind_c(**h_check_matrix,**c_node_index_matrx);
+	ind_c(h_check_matrix, c_node_index_matrx);
 
-	ind_f(**h_check_matrix ,**f_node_index_matrx);
+	ind_f(h_check_matrix , f_node_index_matrx);
 
 	int iteration_counter = 0;
 	for ( iteration_counter; (sindrom != 0 && iteration_counter < counter); iteration_counter++)
 	{
-		f_check (**h_check_matrix , *c_bit_nodes, **f_check_nodes);
+		f_check (h_check_matrix , c_bit_nodes, f_check_nodes);
 
-		parity (**f_check_nodes, **parity_check);
+		parity (f_check_nodes, parity_check);
 
-		bit_nodes (**f_node_index_matrx, **c_node_index_matrx, **parity_check, **bit_nodes_matrix );
+		bit_nodes (f_node_index_matrx, c_node_index_matrx, parity_check, bit_nodes_matrix );
 
-		vote (*y_received_codeword, **bit_nodes_matrix, *c_bit_nodes);
+		vote (y_received_codeword, bit_nodes_matrix, c_bit_nodes);
 
 		sindrom = matr_vec_mult(h_check_matrix, c_bit_nodes);
 	}
