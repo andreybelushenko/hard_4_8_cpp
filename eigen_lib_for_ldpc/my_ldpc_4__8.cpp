@@ -1,20 +1,20 @@
-//
+//03.06---18-09
 #include <iostream>
 using namespace std;
 
 int matr_vec_mult(int h_check_matrix [4][8], int y_received_codeword[8]);
 
-int f_check (int h_check_matrix [4][8], int c_bit_nodes[8]);
+void f_check (int **h_check_matrix , int *c_bit_nodes, int **f_check_nodes);
 
-int parity (int f_check_nodes[4][4]);
+void parity (int **f_check_nodes, int **parity_check);
 
-int bit_nodes (int f_node_index_matrx[8][2], int c_node_index_matrx[4][4], int parity_check [4][4]  );
+void bit_nodes (int **f_node_index_matrx, int **c_node_index_matrx, int **parity_check, int **bit_nodes_matrix );
 
-int vote (int y_received_codeword[8], int bit_nodes_matrix[8][2]);
+void vote (int *y_received_codeword, int **bit_nodes_matrix, int *c_bit_nodes);
 
-int ind_c ( int h_check_matrix [4][8] );
+void ind_c( int **h_check_matrix , int **c_node_index_matrx);
 
-int ind_f ( int h_check_matrix [4][8] );
+void ind_f(int **h_check_matrix , int **f_node_index_matrx);
 
 int main()
 {
@@ -42,20 +42,20 @@ int main()
 
 	int sindrom = matr_vec_mult(h_check_matrix, y_received_codeword);
 
-	c_node_index_matrx = ind_c( h_check_matrix );
+	ind_c(**h_check_matrix,**c_node_index_matrx);
 
-	f_node_index_matrx = ind_f( h_check_matrix );
+	ind_f(**h_check_matrix ,**f_node_index_matrx);
 
 	int iteration_counter = 0;
 	for ( iteration_counter; (sindrom != 0 && iteration_counter < counter); iteration_counter++)
 	{
-		f_check_nodes = f_check ( h_check_matrix,  c_bit_nodes);
-		
-		parity_check = parity (f_check_nodes);
+		f_check (**h_check_matrix , *c_bit_nodes, **f_check_nodes);
 
-		bit_nodes_matrix = bit_nodes ( f_node_index_matrx, c_node_index_matrx,  parity_check );
-		
-		c_bit_nodes = vote (y_received_codeword, bit_nodes_matrix);
+		parity (**f_check_nodes, **parity_check);
+
+		bit_nodes (**f_node_index_matrx, **c_node_index_matrx, **parity_check, **bit_nodes_matrix );
+
+		vote (*y_received_codeword, **bit_nodes_matrix, *c_bit_nodes);
 
 		sindrom = matr_vec_mult(h_check_matrix, c_bit_nodes);
 	}
@@ -103,9 +103,8 @@ int matr_vec_mult(int h_check_matrix [4][8], int y_received_codeword[8])
 	return sum_sindrom;
 }
 
-int f_check (int h_check_matrix [4][8], int c_bit_nodes[8])
+void f_check (int **h_check_matrix , int *c_bit_nodes, int **f_check_nodes)
 {
-	int f_check_nodes[4][4];
 	for  (int i = 0; i < 4; i++)
 		{
 			//int k = 0;
@@ -119,13 +118,10 @@ int f_check (int h_check_matrix [4][8], int c_bit_nodes[8])
 				}
 			}
 		}
-		
-return f_check_nodes;
 }
 
-int parity (int f_check_nodes[4][4])
+void parity (int **f_check_nodes, int **parity_check)
 {
-		int parity_check [4][4];
 		for  (int i = 0, p = 0; i < 4; i++)
 		{   p = 0;
 			for (int k = 0; k < 4; k++)
@@ -137,13 +133,11 @@ int parity (int f_check_nodes[4][4])
 				parity_check[i][j] = ( ( p - f_check_nodes[i][j] ) % 2 );
 			}
 		}
-return parity_check;
 }
 
-int bit_nodes (int f_node_index_matrx[8][2], int c_node_index_matrx[4][4], int parity_check [4][4]  )
+void bit_nodes (int **f_node_index_matrx, int **c_node_index_matrx, int **parity_check, int **bit_nodes_matrix )
 {
-int bit_nodes_matrix[8][2];
-for  (int i = 0, p = 0; i < 8; i++)  //в bit_nodes_matrix матрицу запишем результат проверки четности
+	for  (int i = 0, p = 0; i < 8; i++)  //в bit_nodes_matrix матрицу запишем результат проверки четности
 		{
 			for  (int k = 0; k < 2; k++)  
 			{
@@ -158,12 +152,10 @@ for  (int i = 0, p = 0; i < 8; i++)  //в bit_nodes_matrix матрицу запишем резуль
 				bit_nodes_matrix[i][k] = parity_check[p][jj];
 			}
 		}
-return bit_nodes_matrix;
 }
 
-int vote (int y_received_codeword[8], int bit_nodes_matrix[8][2])
+void vote (int *y_received_codeword, int **bit_nodes_matrix, int *c_bit_nodes)
 {
-	int c_bit_nodes[8];
 	for  (int i = 0; i < 8; i++)
 		{
 			c_bit_nodes[i] =y_received_codeword[i] + bit_nodes_matrix[i][0] + bit_nodes_matrix[i][1];
@@ -172,12 +164,10 @@ int vote (int y_received_codeword[8], int bit_nodes_matrix[8][2])
 			else
 				c_bit_nodes[i] = 0;
 		}
-	return c_bit_nodes;
 }
 
-int ind_c( int h_check_matrix [4][8] )
+void ind_c( int **h_check_matrix , int **c_node_index_matrx)
 {
-	int c_node_index_matrx[4][4];
 	for  (int c = 0; c < 4; c++)   //строки f0:f3, элементы стр - индексы С
 	{
 		for  (int e = 0,  d = 0; e < 8; e++)
@@ -189,13 +179,10 @@ int ind_c( int h_check_matrix [4][8] )
 			}
 		}
 	}
-	
-	return c_node_index_matrx;
 }
 
-int ind_f(int h_check_matrix [4][8])
+void ind_f(int **h_check_matrix , int **f_node_index_matrx)
 {
-	int f_node_index_matrx[8][2];
 	for  (int f = 0; f < 8; f++)   //строки c0:c7, элементы стр - индексы f
 	{
 		for  (int g = 0,  h = 0; g < 4; g++)
@@ -207,6 +194,4 @@ int ind_f(int h_check_matrix [4][8])
 			}
 		}
 	}
-	
-	return f_node_index_matrx;
 }
