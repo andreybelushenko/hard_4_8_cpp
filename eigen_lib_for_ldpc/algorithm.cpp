@@ -1,6 +1,12 @@
 #include "algorithm.h"
 
-
+void c_bit_nodes_from_y(int y_received_codeword[8], int c_bit_nodes[8])
+{
+	for (int q = 0; q < 8; q++)
+	{
+		c_bit_nodes[q] = y_received_codeword[q];  
+	}
+}
 
 int matr_vec_mult(int h_check_matrix [4][8], int y_received_codeword[8])
 {

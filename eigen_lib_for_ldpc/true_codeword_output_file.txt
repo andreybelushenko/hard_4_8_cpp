@@ -1,0 +1,2 @@
+iteration_counter:   1
+true received_codeword:  10010101

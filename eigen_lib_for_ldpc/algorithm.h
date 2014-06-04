@@ -1,6 +1,8 @@
 #include <iostream>
 using namespace std;
 
+void c_bit_nodes_from_y(int y_received_codeword[8], int c_bit_nodes[8]);
+
 int matr_vec_mult(int h_check_matrix [4][8], int y_received_codeword[8]);
 
 void f_check (int h_check_matrix[4][8] , int c_bit_nodes[8], int f_check_nodes[4][4]);
