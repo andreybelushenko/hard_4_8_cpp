@@ -24,6 +24,9 @@
     <ClCompile Include="tools.cpp">
       <Filter>Файлы исходного кода</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\Users\дас\Desktop\примеры срр\разные примеры\6.cpp">
+      <Filter>Файлы исходного кода</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="algorithm.h">
