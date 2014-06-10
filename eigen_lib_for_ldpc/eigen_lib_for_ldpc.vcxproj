@@ -62,7 +62,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\Users\дас\Desktop\примеры срр\разные примеры\6.cpp" />
     <ClCompile Include="algorithm.cpp" />
     <ClCompile Include="my_ldpc_4__8.cpp" />
     <ClCompile Include="tools.cpp" />

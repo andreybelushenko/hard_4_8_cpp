@@ -1,129 +1,148 @@
 #include "algorithm.h"
 
-void c_bit_nodes_from_y(int y_received_codeword[8], int c_bit_nodes[8])
+void c_bit_nodes_from_y( int *y_received_codeword, int *c_bit_nodes, int col )
 {
-	for (int q = 0; q < 8; q++)
+	for (int i = 0; i < col; i++)
 	{
-		c_bit_nodes[q] = y_received_codeword[q];  
+		c_bit_nodes[i] = y_received_codeword[i];  
 	}
 }
 
-int matr_vec_mult(int h_check_matrix [4][8], int y_received_codeword[8])
+int matr_vec_mult( int **h_check_matrix_compact, int *c_bit_nodes, int row, int *num_elem_in_row)
 {
-	// a[m][n]						h_check_matrix
-	// b[] - vect n  elem			y_received_codeword
-	// c[] - vect m  elem
-
-	int c[4] = {1, 1, 1, 1};
-	int m = 4;
-	int n = 8;
-	int sum_sindrom = 0;
-
-	for (int i = 0; i < m; i++) 
-	{
-		c[i] = 0;
-		for (int j =0; j < n; j++)
+	int sindrom  = 1;
+	for  (int i = 0, b = 0, d = 0; i < row; i++)
+	{ 
+		d = num_elem_in_row[i];
+		b = 0;
+		for  (int j = 0, a = 0; j < d; j++)
 		{
-			c[i] += h_check_matrix[i][j]  *  y_received_codeword[j];
+			a = h_check_matrix_compact[i][j];
+			b = b + c_bit_nodes[a];
+
+		}
+		sindrom = (b % 2);
+		if (sindrom  != 0)
+			break;
+	}
+	return sindrom;
+}
+
+void f_check ( int **h_check_matrix_compact, int *c_bit_nodes, int **f_check_nodes, int row, int  *num_elem_in_row )
+{
+	for  (int i = 0; i < row; i++)
+	{
+		for  (int j = 0, a = 0; j < num_elem_in_row[i]; j++)
+		{
+			a = h_check_matrix_compact[i][j];
+			f_check_nodes[i][j] = c_bit_nodes[a];
+		}
+	}
+}
+
+void parity (int **f_check_nodes, int row, int  *num_elem_in_row )
+{	
+	for  (int i = 0, a = 0; i < row; i++)
+	{	
+		a = 0;
+		for  (int j = 0; j < num_elem_in_row[i]; j++)
+		{  
+			if ( f_check_nodes[i][j] != 0)
+			{
+				a = a + f_check_nodes[i][j];
+			}
+		}
+		if ((a % 2 ) != 0)
+		{
+			for  (int k = 0; k < num_elem_in_row[i]; k++)
+			{
+				f_check_nodes[i][k] = ~ f_check_nodes[i][k];
+			}
 		}
 	}
 
-	for (int i = 0; i < m; i++)
+}
+
+void vote (int *num_elem_in_row, int **h_check_matrix_compact, int row, int col, int *y_received_codeword, int *c_bit_nodes, int **f_check_nodes )
+{
+	c_bit_nodes_from_y(y_received_codeword, c_bit_nodes, col );
+	for (int i=0; i<row; i++)
 	{
-		sum_sindrom = sum_sindrom + (c[i] % 2);
+		for (int j=0, k = 0; j < num_elem_in_row[i]; j++)
+		{
+			k = h_check_matrix_compact[i][j];
+			c_bit_nodes[k] = c_bit_nodes[k] + f_check_nodes[i][j];
+		}
 	}
-	return sum_sindrom;
 }
 
-void f_check (int h_check_matrix[4][8] , int c_bit_nodes[8], int f_check_nodes[4][4])
+void cells_in_row(int *num_elem_in_row, const int row, const int col, int *h_check_matrix)
 {
-	for  (int i = 0; i < 4; i++)
-		{
-			//int k = 0;
-			for (int j = 0, k = 0; j < 8; j++)
-			{
-				if (h_check_matrix[i][j] == 1)
-				{	
-					
-					f_check_nodes[i][k] = c_bit_nodes[j];
-					k++;
-				}
-			}
-		}
-}
-
-void parity (int f_check_nodes[4][4], int parity_check[4][4])
-{
-		for  (int i = 0, p = 0; i < 4; i++)
-		{   p = 0;
-			for (int k = 0; k < 4; k++)
-				{
-					p = p + f_check_nodes[i][k];
-				}
-			for (int j = 0; j < 4; j++)
-			{
-				parity_check[i][j] = ( ( p - f_check_nodes[i][j] ) % 2 );
-			}
-		}
-}
-
-void bit_nodes (int f_node_index_matrx[8][2], int c_node_index_matrx[4][4], int parity_check[4][4], int bit_nodes_matrix[8][2]  )
-{
-	for  (int i = 0, p = 0; i < 8; i++)  //в bit_nodes_matrix матрицу запишем результат проверки четности
-		{
-			for  (int k = 0; k < 2; k++)  
-			{
-				int jj = 0;
-				p=f_node_index_matrx[i][k];
-				for  (int j = 0; j < 4; j++)
-				{
-					jj = j;
-					if (c_node_index_matrx[p][jj] == i)
-						break;
-				}
-				bit_nodes_matrix[i][k] = parity_check[p][jj];
-			}
-		}
-}
-
-void vote (int y_received_codeword[8], int bit_nodes_matrix[8][2], int c_bit_nodes[8])
-{
-	for  (int i = 0; i < 8; i++)
-		{
-			c_bit_nodes[i] =y_received_codeword[i] + bit_nodes_matrix[i][0] + bit_nodes_matrix[i][1];
-			if (c_bit_nodes[i] > 1)
-				c_bit_nodes[i] = 1;
-			else
-				c_bit_nodes[i] = 0;
-		}
-}
-
-void ind_c(  int h_check_matrix[4][8] , int c_node_index_matrx[4][4])
-{
-	for  (int c = 0; c < 4; c++)   //строки f0:f3, элементы стр - индексы С
+	for (int i=0, a=0; i<row; i++)
 	{
-		for  (int e = 0,  d = 0; e < 8; e++)
-		{
-			if (h_check_matrix [c][e] ==1)
+		a = 0;
+		for (int j=0; j<col; j++)
+		{	 
+			if (  (  h_check_matrix[i * col + j]  )  != 0) 
 			{
-				c_node_index_matrx[c][d]= e;
-				d++;
+				a++;
+			}
+		}
+		num_elem_in_row[i] = a ; 
+	}
+}
+
+void h_compact(int *num_elem_in_row, const int row, const int col, int *h_check_matrix, int **h_check_matrix_compact )
+{
+	for (int i = 0; i < row; i++)
+	{	
+		for (int j = 0, k = 0; j < col; j++)
+		{
+			if (   (  h_check_matrix[i * col + j]  ) == 1)
+			{	
+				h_check_matrix_compact[i][k] = j;
+				k++;
 			}
 		}
 	}
 }
 
-void ind_f(int h_check_matrix[4][8] , int f_node_index_matrx[8][2])
+void hard_decision(int row, const int col, int *num_elem_in_row, int sindrom, int iteration_counter, int counter, int *y_received_codeword,
+	int **h_check_matrix_compact, int *c_bit_nodes, int **f_check_nodes)
+
 {
-	for  (int f = 0; f < 8; f++)   //строки c0:c7, элементы стр - индексы f
+	c_bit_nodes_from_y(y_received_codeword, c_bit_nodes, col );
+	//codeword_cout((char *)"c_bit_nodes", c_bit_nodes, col );
+
+	for ( iteration_counter; (sindrom != 0 && iteration_counter < counter); iteration_counter++)
 	{
-		for  (int g = 0,  h = 0; g < 4; g++)
-		{
-			if (h_check_matrix [g][f] ==1)
-			{
-				f_node_index_matrx[f][h]= g;
-				h++;
-			}
-		}
+		f_check (h_check_matrix_compact, c_bit_nodes, f_check_nodes, row, num_elem_in_row );
+
+		parity (f_check_nodes, row, num_elem_in_row );
+
+		vote (num_elem_in_row, h_check_matrix_compact, row, col, y_received_codeword, c_bit_nodes, f_check_nodes );
+
+		sindrom = matr_vec_mult( h_check_matrix_compact, c_bit_nodes, row, num_elem_in_row );
 	}
 }
+
+// *(*(matrix+i)+j); если		int **h_check_matrix_compact
+// arr[ i * col + j] = 123;		int* arr 
+
+
+
+//void cells_in_col(int *num_elem_in_col, const int row, const int col, int *h_check_matrix)
+//{
+//	for (int i=0, a=0; i<col; i++)
+//	{
+//		a = 0;
+//		for (int j=0; j<row; j++)
+//		{	 
+//			if (  (  h_check_matrix[i + row * j]  )  != 0) 
+//			{
+//				a++;
+//			}
+//		}
+//		num_elem_in_col[i] = a ; 
+//	}
+//}
